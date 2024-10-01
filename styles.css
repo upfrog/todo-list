@@ -1,0 +1,31 @@
+body {
+    background-color: purple;
+}
+
+
+#itemWrapper {
+    display: flex;
+    background-color: white;
+    padding: 5px;
+    gap:50px;
+
+    max-width: 550px;
+    display: flex;
+    word-wrap: break-word;
+}
+
+ul {
+    list-style-type: none;
+}
+
+#itemWrapper button {
+    background-color: orange;
+    align-self: center;
+}
+
+#itemWrapper li {
+    max-width: 400px;
+    min-width: 400px;
+
+}
+
