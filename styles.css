@@ -3,7 +3,7 @@ body {
 }
 
 
-#itemWrapper {
+.itemWrapper {
     display: flex;
     background-color: white;
     padding: 5px;
@@ -18,17 +18,17 @@ ul {
     list-style-type: none;
 }
 
-#itemWrapper button {
+.itemWrapper button {
     background-color: orange;
     align-self: center;
 }
 
-#itemWrapper li {
+.itemWrapper li {
     max-width: 400px;
     min-width: 400px;
 
 }
 
-#itemWrapper.completed {
+.itemWrapper.completed {
     background-color: green;
 }

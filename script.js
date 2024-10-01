@@ -4,12 +4,26 @@
  */
 
 
+
+
 let addNewTaskBtn = document.querySelector(".addNewTaskBtn");
 
+/*
+Why should I store nodes instead of raw text? If the user has multiple
+identical entries to the list, and wants to remove one, it will be difficult
+to tell them apart if I store raw text.
+
+This is a global variable. This makes the program not threadsafe, and may
+introduce some footguns for the future.
+
+On the up side, the alternative was to constantly pass the taskArray up and
+down the call stack, despite many of those functions making no direct use of 
+it.
+*/
 const taskArray = [[]];
 
 //Make sure the default list is selected
-taskArray.push(["List"]);
+taskArray[0] = (["List"]);
 
 
 
@@ -38,35 +52,51 @@ taskListSelector.appendChild(task2);
 
 
 
-/*
+
 
 
 addNewTaskBtn.addEventListener("click", () => {
     let newTask = document.querySelector("#taskInput")
     let t = newTask.value;
-    alert(t);
 
-    addToList(t)
-    //storeNewItem(taskArray, t);
+    itemWrapper = wrapItem(t);
+    storeNewItem(itemWrapper);
+    addToList(itemWrapper, taskArray);
+    
+    
+    console.log(taskArray);
+    console.log(taskArray[0].length);
+    console.log(taskArray[1].length);
     
 });
 
 
 
 
-/*
+
 taskListSelector.onchange = (event) => {
     populateList()
 }
 
 
 
+function populateList() {
+    let newTasklist = findCurTaskListIndex(taskArray);
+    let container = document.querySelector("#tasks");
+    container.replaceChildren();
 
-function storeNewItem(taskArray, new_item) {
+    for (let j = 1; j < taskArray[newTasklist].length; j++) {
+        addToList(taskArray[newTasklist][j], taskArray);
+    }
+    
+}
+
+
+function storeNewItem(new_item) {
     let i = findCurTaskListIndex(taskArray);
     taskArray[i].push(new_item);
 }
-*/
+
 
 
 /**
@@ -83,28 +113,20 @@ function storeNewItem(taskArray, new_item) {
  *        
  * @returns {Number}    The index of the list with the currently selected name.
  */
-function findCurTaskListIndex(taskArray) {
+function findCurTaskListIndex() {
     let curList = document.querySelector("#taskListSelector").value;
 
     for (let i = 0; i < taskArray.length; i++) {
         if (taskArray[i][0] === curList) {
-            break;
+            return i;
         }
     }
 
-    return i;
+    
 }
 
 
 
-function populateList(list) {
-    let container = document.querySelector("#tasks");
-    container.replaceChildren();
-
-    for (let i = 1; i < list.length; i++) {
-        addToList(item);
-    }
-}
 
 
 /*
@@ -118,24 +140,11 @@ I need to seperate two pieces of logic:
 
 
 
-function addToList(item) {
+function addToList(itemWrapper) {
     let container = document.querySelector("#tasks");
     
 
-    let content = document.createElement("li");
-    content.textContent = item;
-    
-    let deleteBtn = document. createElement("button");
-    deleteBtn.textContent = "Remove"
 
-    let completeBtn = document.createElement("button");
-    completeBtn.textContent = "Completed";
-    
-    let itemWrapper = document.createElement("div");
-    itemWrapper.setAttribute("id", "itemWrapper");
-    itemWrapper.appendChild(content);
-    itemWrapper.appendChild(deleteBtn);
-    itemWrapper.appendChild(completeBtn);
 
     
     
@@ -143,8 +152,53 @@ function addToList(item) {
 
     container.appendChild(itemWrapper);
 
+    let deleteBtn = itemWrapper.querySelector(".deleteBtn")
+    let completeBtn = itemWrapper.querySelector(".completeBtn")
+
+    //Should these be in the item wrapper?
+    /*
+    deleteBtn.addEventListener("click", function (e) {
+        console.log(e)
+        //container.removeChild(itemWrapper);
+        e.originalTarget.parentNode.parentNode.removeChild(itemWrapper);
+        removeStoredItem(itemWrapper);
+
+    });
+
+    completeBtn.addEventListener("click", () => {
+        itemWrapper.classList.toggle("completed");
+    })
+    
+    */
+    return itemWrapper;
+}
+    
+
+function wrapItem(item) {
+    let content = document.createElement("li");
+    content.textContent = item;
+    
+    let deleteBtn = document.createElement("button");
+    deleteBtn.setAttribute("class", "deleteBtn");
+    deleteBtn.textContent = "Remove"
+
+    let completeBtn = document.createElement("button");
+    completeBtn.setAttribute("class", "completeBtn");
+    completeBtn.textContent = "Completed";
+    
+    let itemWrapper = document.createElement("div");
+    itemWrapper.setAttribute("class", "itemWrapper");
+    itemWrapper.appendChild(content);
+    itemWrapper.appendChild(deleteBtn);
+    itemWrapper.appendChild(completeBtn);
+
+
+    //Consider putting these back in addToList()
+    
+    let container = document.querySelector("#tasks");
     deleteBtn.addEventListener("click", () => {
         container.removeChild(itemWrapper);
+        removeStoredItem(itemWrapper);
     });
 
     completeBtn.addEventListener("click", () => {
@@ -152,11 +206,27 @@ function addToList(item) {
     })
     
 
+    return itemWrapper;
 }
-    
+
+
+function removeStoredItem(wrappedItem) {
+    let i = findCurTaskListIndex(taskArray);
+
+    let toDelete = taskArray[i].indexOf(wrappedItem);
+
+    taskArray[i].splice(toDelete, 1);
+    console.log(taskArray);
+    console.log(taskArray[0].length);
+    console.log(taskArray[1].length);
+}
 
 
 /*
+To solve the current weirdness about the deleted node not being a child
+of the parent node, consider giving every list element a unique id and
+using that?
+
 
 Improvements:
 - Add a "completed" button that crosses a task out/greys it out/moves it to
@@ -166,5 +236,7 @@ a completed list/something
 - Make the design less painful
 - Add a "see completed tasks" button and/or a "clear all" button
 - Add a select button?
+- Implement a search
+- Make the search extra fancy and use a trie or similar
 
 */
