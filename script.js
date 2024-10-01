@@ -4,17 +4,17 @@
  */
 
 
-let btn = document.querySelector(".addNewTaskBtn");
+let addNewTaskBtn = document.querySelector(".addNewTaskBtn");
 
 const taskArray = [[]];
 
 //Make sure the default list is selected
-taskArray[0][0] = "List";
+taskArray.push(["List"]);
 
 
 
 //Just for testing
-taskArray[1][0] = "Homework";
+taskArray.push(["Homework"]);
 
 
 let taskListSelector = document.querySelector("#taskListSelector");
@@ -38,17 +38,21 @@ taskListSelector.appendChild(task2);
 
 
 
+/*
 
 
-
-btn.addEventListener("click", () => {
+addNewTaskBtn.addEventListener("click", () => {
     let newTask = document.querySelector("#taskInput")
     let t = newTask.value;
+    alert(t);
 
     addToList(t)
     //storeNewItem(taskArray, t);
     
 });
+
+
+
 
 /*
 taskListSelector.onchange = (event) => {
