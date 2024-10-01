@@ -52,9 +52,6 @@ taskListSelector.appendChild(task2);
 
 
 
-
-
-
 addNewTaskBtn.addEventListener("click", () => {
     let newTask = document.querySelector("#taskInput")
     let t = newTask.value;
@@ -62,16 +59,35 @@ addNewTaskBtn.addEventListener("click", () => {
     itemWrapper = wrapItem(t);
     storeNewItem(itemWrapper);
     addToList(itemWrapper, taskArray);
-    
-    
-    console.log(taskArray);
-    console.log(taskArray[0].length);
-    console.log(taskArray[1].length);
-    
 });
 
 
+createNewTaskListBtn = document.querySelector(".createNewTaskListBtn");
 
+createNewTaskListBtn.addEventListener("click", () => {
+    let newTaskList = document.querySelector("#newTaskListInput").value;
+    //let t = newTaskList.value;
+
+    if (validateNewTaskList(newTaskList) == false) {
+        alert("That name is already in use. Please choose a different one.");
+        return;
+    }
+    let newTaskListOption = document.createElement("option");
+    newTaskListOption.textContent = newTaskList;
+
+    taskListSelector.appendChild(newTaskListOption);
+    taskArray.push([newTaskList]);
+})
+
+
+function validateNewTaskList(newTaskListName) {
+    for (let i = 0; i < taskArray.length; i++) {
+        if (taskArray[i][0] === newTaskListName) {
+            return false;
+        }
+    }
+    return true;
+}
 
 
 taskListSelector.onchange = (event) => {
@@ -122,6 +138,7 @@ function findCurTaskListIndex() {
         }
     }
 
+    
     
 }
 
@@ -194,7 +211,6 @@ function wrapItem(item) {
 
 
     //Consider putting these back in addToList()
-    
     let container = document.querySelector("#tasks");
     deleteBtn.addEventListener("click", () => {
         container.removeChild(itemWrapper);
@@ -216,27 +232,22 @@ function removeStoredItem(wrappedItem) {
     let toDelete = taskArray[i].indexOf(wrappedItem);
 
     taskArray[i].splice(toDelete, 1);
-    console.log(taskArray);
-    console.log(taskArray[0].length);
-    console.log(taskArray[1].length);
 }
 
 
 /*
-To solve the current weirdness about the deleted node not being a child
-of the parent node, consider giving every list element a unique id and
-using that?
-
-
-Improvements:
-- Add a "completed" button that crosses a task out/greys it out/moves it to
-a completed list/something
-- Add multiple tabs of tasks
+Future Improvements:
 - Add subtasks
 - Make the design less painful
 - Add a "see completed tasks" button and/or a "clear all" button
 - Add a select button?
 - Implement a search
 - Make the search extra fancy and use a trie or similar
+- Remove a task list
 
+
+Completed Improvements:
+- Add a "completed" button that crosses a task out/greys it out/moves it to
+a completed list/something
+- Add multiple tabs of tasks
 */
