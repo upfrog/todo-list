@@ -1,8 +1,30 @@
 
-const btn = document.querySelector(".addNewTaskBtn");
+let btn = document.querySelector(".addNewTaskBtn");
+
+const task_array = [[]];
+
+//Make sure the default list is selected
+task_array[0][0] = "List";
+
+
+let taskListSelector = document.querySelector("#taskListSelector");
+
+let task1 = document.createElement("option");
+task1.textContent = "Pfffffffffff";
+
+taskListSelector.appendChild(task1);
+
+
+let defaultList = document.querySelector("#taskListSelector").value;
+
+
+
+
+
+
 
 btn.addEventListener("click", () => {
-    const newTask = document.querySelector("#taskInput")
+    let newTask = document.querySelector("#taskInput")
     let t = newTask.value;
 
     addToList(t)
@@ -14,34 +36,33 @@ btn.addEventListener("click", () => {
 
 
 
+function populateList(list) {
+    list.forEach((item) => addToList(item));
+}
+
+
+
+
 
 
 function addToList(item) {
-
-
-    /*
-    const container = document.querySelector("#tasks");
-
-    const content = document.createElement("div");
-    content.classList.add("content");
-    content.textContent = item;
-
-    container.appendChild(content);
-    */
-
-    const container = document.querySelector("#tasks");
+    let container = document.querySelector("#tasks");
     
 
-    const content = document.createElement("li");
+    let content = document.createElement("li");
     content.textContent = item;
     
-    const deleteBtn = document. createElement("button");
+    let deleteBtn = document. createElement("button");
     deleteBtn.textContent = "Remove"
+
+    let completeBtn = document.createElement("button");
+    completeBtn.textContent = "Completed";
     
-    const itemWrapper = document.createElement("div");
+    let itemWrapper = document.createElement("div");
     itemWrapper.setAttribute("id", "itemWrapper");
     itemWrapper.appendChild(content);
     itemWrapper.appendChild(deleteBtn);
+    itemWrapper.appendChild(completeBtn);
 
     
     
@@ -52,9 +73,25 @@ function addToList(item) {
     deleteBtn.addEventListener("click", () => {
         container.removeChild(itemWrapper);
     });
+
+    completeBtn.addEventListener("click", () => {
+        itemWrapper.classList.toggle("completed");
+    })
     
 
 }
     
 
 
+/*
+
+Improvements:
+- Add a "completed" button that crosses a task out/greys it out/moves it to
+a completed list/something
+- Add multiple tabs of tasks
+- Add subtasks
+- Make the design less painful
+- Add a "see completed tasks" button and/or a "clear all" button
+- Add a select button?
+
+*/
