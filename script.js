@@ -1,86 +1,84 @@
 /**
  * This code is over-commented, because I want to practice JavaScript
- * documentation standards
+ * documentation standards.
  */
 
-
-
-
-let addNewTaskBtn = document.querySelector(".addNewTaskBtn");
-
-/*
-Why should I store nodes instead of raw text? If the user has multiple
-identical entries to the list, and wants to remove one, it will be difficult
-to tell them apart if I store raw text.
-
-This is a global variable. This makes the program not threadsafe, and may
-introduce some footguns for the future.
-
-On the up side, the alternative was to constantly pass the taskArray up and
-down the call stack, despite many of those functions making no direct use of 
-it.
-*/
+/**
+ * This array stores all session data. Each subarray represents a
+ * task list.
+ * 
+ * Index[0] of a given sub array is that task list's name. The rest
+ * of the array is the related task nodes. Storing nodes instead of
+ * raw text makes it easier to distinguish multiple identical tasks.
+ * 
+ * If this was not global, I would have to pass it up and down the
+ * call stack, through many functions which make no direct use of it.
+ * This seems like more of a problem than using a global variable.
+ */
 const taskArray = [[]];
 
-//Make sure the default list is selected
-taskArray[0] = (["List"]);
+init();
 
+function init() {
+    setupTaskListManager();
+    setupTaskManager();
+}
 
+/**
+ * Sets up an event listener for adding new tasks to a list.
+ */
+function setupTaskManager() {
+    let addNewTaskBtn = document.querySelector(".addNewTaskBtn");
+    
+    addNewTaskBtn.addEventListener("click", () => {
+        let newTask = document.querySelector("#taskInput").value;
 
-//Just for testing
-taskArray.push(["Homework"]);
+        itemWrapper = wrapItem(newTask);
+        storeNewItem(itemWrapper);
+        drawItem(itemWrapper, taskArray);
+    });
+}
 
+/**
+ * Sets up a default task list and several related event listeners.
+ */
+function setupTaskListManager() {
+    //Create a default task list
+    taskArray[0] = (["Default"]);
+    let taskListSelector = document.querySelector("#taskListSelector");
+    let defaultTask = document.createElement("option");
+    defaultTask.textContent = taskArray[0][0];
+    taskListSelector.appendChild(defaultTask);
 
-let taskListSelector = document.querySelector("#taskListSelector");
+    //Set up listener to add new task lists.
+    createNewTaskListBtn = document.querySelector(".createNewTaskListBtn");
+    createNewTaskListBtn.addEventListener("click", () => {
+        let newTaskList = document.querySelector("#newTaskListInput").value;
 
-let task1 = document.createElement("option");
-task1.textContent = "List";
+        if (validateNewTaskListName(newTaskList) == false) {
+            alert("That name is already in use. Please choose a different one.");
+            return;
+        }
+        let newTaskListOption = document.createElement("option");
+        newTaskListOption.textContent = newTaskList;
 
-taskListSelector.appendChild(task1);
+        taskListSelector.appendChild(newTaskListOption);
+        taskArray.push([newTaskList]);
+    })
 
-
-let task2 = document.createElement("option");
-task2.textContent = "Homework";
-
-taskListSelector.appendChild(task2);
-
-
-
-//let defaultList = document.querySelector("#taskListSelector").value;
-
-
-
-
-
-addNewTaskBtn.addEventListener("click", () => {
-    let newTask = document.querySelector("#taskInput")
-    let t = newTask.value;
-
-    itemWrapper = wrapItem(t);
-    storeNewItem(itemWrapper);
-    addToList(itemWrapper, taskArray);
-});
-
-
-createNewTaskListBtn = document.querySelector(".createNewTaskListBtn");
-
-createNewTaskListBtn.addEventListener("click", () => {
-    let newTaskList = document.querySelector("#newTaskListInput").value;
-    //let t = newTaskList.value;
-
-    if (validateNewTaskList(newTaskList) == false) {
-        alert("That name is already in use. Please choose a different one.");
-        return;
+    //Set up listener to redraw list when list selector is changed.
+    taskListSelector.onchange = function() {
+        clearAndPopulateList()
     }
-    let newTaskListOption = document.createElement("option");
-    newTaskListOption.textContent = newTaskList;
-
-    taskListSelector.appendChild(newTaskListOption);
-    taskArray.push([newTaskList]);
-})
+}
 
 
-function validateNewTaskList(newTaskListName) {
+/**
+ * @param {string} newTaskListName
+ * 
+ * @returns {boolean}   Whether or not the newTaskListName is valid.
+ */
+function validateNewTaskListName(newTaskListName) {
     for (let i = 0; i < taskArray.length; i++) {
         if (taskArray[i][0] === newTaskListName) {
             return false;
@@ -89,31 +87,27 @@ function validateNewTaskList(newTaskListName) {
     return true;
 }
 
-
-taskListSelector.onchange = (event) => {
-    populateList()
-}
-
-
-
-function populateList() {
+/**
+ * Clears the current list and replaces it with new content.
+ */
+function clearAndPopulateList() {
     let newTasklist = findCurTaskListIndex(taskArray);
-    let container = document.querySelector("#tasks");
-    container.replaceChildren();
+    document.querySelector("#tasks").replaceChildren();
 
     for (let j = 1; j < taskArray[newTasklist].length; j++) {
-        addToList(taskArray[newTasklist][j], taskArray);
+        drawItem(taskArray[newTasklist][j], taskArray);
     }
-    
 }
 
-
-function storeNewItem(new_item) {
+/**
+ * Adds a node to the appropriate task sublist.
+ * 
+ * @param {node} newItem    A prepared node.
+ */
+function storeNewItem(newItem) {
     let i = findCurTaskListIndex(taskArray);
-    taskArray[i].push(new_item);
+    taskArray[i].push(newItem);
 }
-
-
 
 /**
  * Finds the subarray with the name of the currently selected task list
@@ -137,60 +131,32 @@ function findCurTaskListIndex() {
             return i;
         }
     }
-
-    
-    
 }
 
-
-
-
-
-/*
-
-I need to seperate two pieces of logic:
-    - Given some text that makes up a task, turn it into a thing on the screen
-    - Track that text as part of a specific list, which can later be recalled.
-*/
-
-
-
-
-
-function addToList(itemWrapper) {
+/**
+ * Appends a node to the DOM.
+ * 
+ * @param {node} itemWrapper    A prepared node.
+ */
+function drawItem(itemWrapper) {
     let container = document.querySelector("#tasks");
-    
-
-
-
-    
-    
-
-
     container.appendChild(itemWrapper);
-
-    let deleteBtn = itemWrapper.querySelector(".deleteBtn")
-    let completeBtn = itemWrapper.querySelector(".completeBtn")
-
-    //Should these be in the item wrapper?
-    /*
-    deleteBtn.addEventListener("click", function (e) {
-        console.log(e)
-        //container.removeChild(itemWrapper);
-        e.originalTarget.parentNode.parentNode.removeChild(itemWrapper);
-        removeStoredItem(itemWrapper);
-
-    });
-
-    completeBtn.addEventListener("click", () => {
-        itemWrapper.classList.toggle("completed");
-    })
-    
-    */
-    return itemWrapper;
 }
     
-
+/**
+ * Prepares a string of user input to be added to the list.
+ * 
+ * Wraps user input in an HTML li, adds buttons, and binds listeners.
+ * This is seperated into it's own function to allow for re-use of
+ * the code for adding an object to the DOM. A given piece of user
+ * input may be added to and removed from the DOM many times, but
+ * it should only be wrapped in an HTML element once.
+ * 
+ * @param {string}  Item    The inputted text to be added to the list.
+ * 
+ * @returns {node}  A node which contains the text Item, and is
+ *                  ready to be added to the DOM.
+ */
 function wrapItem(item) {
     let content = document.createElement("li");
     content.textContent = item;
@@ -209,8 +175,6 @@ function wrapItem(item) {
     itemWrapper.appendChild(deleteBtn);
     itemWrapper.appendChild(completeBtn);
 
-
-    //Consider putting these back in addToList()
     let container = document.querySelector("#tasks");
     deleteBtn.addEventListener("click", () => {
         container.removeChild(itemWrapper);
@@ -221,16 +185,18 @@ function wrapItem(item) {
         itemWrapper.classList.toggle("completed");
     })
     
-
     return itemWrapper;
 }
 
-
+/**
+ * Removes a given node from the taskArray.
+ * 
+ * @param {node} wrappedItem    A node which has previously been
+ *                              processed.
+ */
 function removeStoredItem(wrappedItem) {
     let i = findCurTaskListIndex(taskArray);
-
     let toDelete = taskArray[i].indexOf(wrappedItem);
-
     taskArray[i].splice(toDelete, 1);
 }
 
