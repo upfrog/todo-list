@@ -1,6 +1,25 @@
 /**
  * This code is over-commented, because I want to practice JavaScript
  * documentation standards.
+ * 
+ * Potential future improvements:
+ * - Make the page less ugly!
+ * - Add ability to delete a task list
+ * - Add ability to clear a task list
+ * - Add subtasks
+ * - Add a select button enable eg deleting many items at once
+ * - Add ability to sort tasks
+ * - Add ability to see all completed tasks
+ * - Add a search function
+ *      - Extra: Make that search fancy with a trie!
+ * - Enable adding tasks with Enter
+ * - Add a beforeUnload alert asking if you are sure you want to lose your data
+ * - Use event delegation to be more efficient
+ * 
+ * Completed Improvements:
+ * - Add a way to mark a task as completed while not removing it.
+ * - Add multiple tabs of tasks. 
+ * 
  */
 
 /**
@@ -201,19 +220,3 @@ function removeStoredItem(wrappedItem) {
 }
 
 
-/*
-Future Improvements:
-- Add subtasks
-- Make the design less painful
-- Add a "see completed tasks" button and/or a "clear all" button
-- Add a select button?
-- Implement a search
-- Make the search extra fancy and use a trie or similar
-- Remove a task list
-
-
-Completed Improvements:
-- Add a "completed" button that crosses a task out/greys it out/moves it to
-a completed list/something
-- Add multiple tabs of tasks
-*/
